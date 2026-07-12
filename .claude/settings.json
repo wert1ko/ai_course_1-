@@ -1,0 +1,11 @@
+{
+  "model": "opusplan",
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://ai.groupbwt.dev/v1",
+    "ANTHROPIC_AUTH_TOKEN": "sk-d03829404ad100ea-a6e3fc-de567bbf",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "bwt-sonnet",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "bwt-opus-1m[1m]",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "bwt-haiku",
+    "ANTHROPIC_SMALL_FAST_MODEL": "bwt-haiku"
+  }
+}
