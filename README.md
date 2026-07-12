@@ -1,1 +1,1 @@
-# ai_course_1-
+# ai_course_2-
