@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 from typing import Optional, List
@@ -49,10 +49,10 @@ class NDADocumentResponse(BaseModel):
 async def get_current_user_id(request: Request) -> int:
     token = request.cookies.get(COOKIE_NAME)
     if not token:
-        raise Exception("Not authenticated")
+        raise HTTPException(status_code=401, detail="Not authenticated")
     user_id = get_user_from_token(token)
     if not user_id:
-        raise Exception("Invalid session")
+        raise HTTPException(status_code=401, detail="Invalid session")
     return user_id
 
 
@@ -108,6 +108,5 @@ async def get_document(
     user_id = await get_current_user_id(request)
     doc = await session.get(NDADocument, doc_id)
     if not doc or doc.user_id != user_id:
-        from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Document not found")
     return doc

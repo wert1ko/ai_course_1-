@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -8,7 +8,7 @@ from app.database import init_db
 from app.routes.auth import router as auth_router
 from app.routes.nda import router as nda_router
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # project root
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 FRONTEND_OUT = BASE_DIR / "frontend" / "out"
 
 
@@ -35,15 +35,9 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(nda_router)
 
-# Serve static assets explicitly — avoids catching API routes
+# Serve static assets only (these paths can't conflict with API routes)
 if FRONTEND_OUT.exists():
-    app.mount("/_next", StaticFiles(directory=str(FRONTEND_OUT / "_next"), html=False), name="next_static")
-    app.mount("/favicon.ico", StaticFiles(directory=str(FRONTEND_OUT), html=False), name="favicon")
-    app.mount("/next.svg", StaticFiles(directory=str(FRONTEND_OUT), html=False), name="next_svg")
-    app.mount("/file.svg", StaticFiles(directory=str(FRONTEND_OUT), html=False), name="file_svg")
-    app.mount("/globe.svg", StaticFiles(directory=str(FRONTEND_OUT), html=False), name="globe_svg")
-    app.mount("/window.svg", StaticFiles(directory=str(FRONTEND_OUT), html=False), name="window_svg")
-    app.mount("/vercel.svg", StaticFiles(directory=str(FRONTEND_OUT), html=False), name="vercel_svg")
+    app.mount("/_next", StaticFiles(directory=str(FRONTEND_OUT / "_next"), html=False))
 
 
 @app.get("/health")
@@ -52,18 +46,25 @@ async def health():
 
 
 @app.get("/{path:path}")
-async def serve_frontend_index(path: str):
+async def serve_frontend(request: Request, path: str):
+    """
+    Serve the correct pre-built HTML for Next.js routes (SPA).
+    Fall back to index.html for client-side navigation.
+    """
     if FRONTEND_OUT.exists():
+        # Check if the requested path has a pre-built HTML file
+        for candidate in [FRONTEND_OUT / f"{path}.html", FRONTEND_OUT / path]:
+            if candidate.exists() and candidate.is_file():
+                return FileResponse(str(candidate))
+        # Fallback to index.html for client-side routing
         index = FRONTEND_OUT / "index.html"
         if index.exists():
             return FileResponse(str(index))
-    from fastapi.responses import HTMLResponse
-    return HTMLResponse("<h1>404</h1>", status_code=404)
+    return HTMLResponse("<h1>404 — Not found</h1>", status_code=404)
 
 
 @app.get("/")
 async def root():
     if FRONTEND_OUT.exists():
         return FileResponse(str(FRONTEND_OUT / "index.html"))
-    from fastapi.responses import HTMLResponse
-    return HTMLResponse("<h1>Prelegal API</h1><p>Run the frontend build to serve the UI.</p>")
+    return HTMLResponse("<h1>Prelegal API</h1>")
