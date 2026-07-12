@@ -5,6 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 from pathlib import Path
 from app.database import init_db
+from app.routes.auth import router as auth_router
+from app.routes.nda import router as nda_router
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent  # project root
 FRONTEND_OUT = BASE_DIR / "frontend" / "out"
@@ -29,6 +31,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth_router)
+app.include_router(nda_router)
 
 # Serve static assets explicitly — avoids catching API routes
 if FRONTEND_OUT.exists():

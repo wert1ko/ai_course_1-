@@ -3,10 +3,21 @@ from datetime import datetime
 from typing import Optional
 
 
+class User(SQLModel, table=True):
+    __tablename__ = "users"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    email: str = Field(unique=True, index=True)
+    password_hash: str
+    name: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
 class NDADocument(SQLModel, table=True):
     __tablename__ = "nda_documents"
 
     id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="users.id", index=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
     party_a_name: str
