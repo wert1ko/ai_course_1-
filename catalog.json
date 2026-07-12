@@ -1,0 +1,18 @@
+[
+  {
+    "id": "mutual-nda",
+    "name": "Mutual Non-Disclosure Agreement",
+    "description": "A bilateral agreement where both parties agree to keep each other's confidential information private.",
+    "fields": [
+      { "key": "party_a_name", "label": "Party A — Full Name", "type": "text", "required": true },
+      { "key": "party_a_company", "label": "Party A — Company (optional)", "type": "text", "required": false },
+      { "key": "party_a_address", "label": "Party A — Address", "type": "text", "required": true },
+      { "key": "party_b_name", "label": "Party B — Full Name", "type": "text", "required": true },
+      { "key": "party_b_company", "label": "Party B — Company (optional)", "type": "text", "required": false },
+      { "key": "party_b_address", "label": "Party B — Address", "type": "text", "required": true },
+      { "key": "effective_date", "label": "Effective Date", "type": "date", "required": true },
+      { "key": "jurisdiction", "label": "Governing State / Jurisdiction", "type": "select", "required": true, "options": "US_STATES" },
+      { "key": "term", "label": "Term / Duration", "type": "text", "required": true, "placeholder": "e.g. 2 years" }
+    ]
+  }
+]
